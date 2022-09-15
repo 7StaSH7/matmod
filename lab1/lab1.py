@@ -49,8 +49,6 @@ def calcAngle(line1, line2):
 def ccw(A, B, C):
     return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
 
-# Return true if line segments AB and CD intersect
-
 
 def isIntersect(A, B, C, D):
     return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
@@ -63,16 +61,20 @@ def calcIsScored(playerX, playerY):
     angle = calcAngle(np.array([gateX, gateYMiddle] - playerCords),
                       np.array([playerX + maxLength, playerY]) - playerCords)
 
+    if playerY > fieldWidth / 2:
+        angle = -angle
+
     goalCords = rotate(playerCords, goalCordsWothoutRotate, angle)
 
-    if playerX == 80 and playerY == 45:
-        print("angle: ", angle)
+    if playerY == gateYMiddle:
+        print("angle: ", math.degrees(angle))
         print("goalCords: ", goalCords)
         print("isIntersect: ", isIntersect(playerCords, goalCords,
-              [gateX, gateYBottom], [gateX, gateYUpper]))
+                                           [gateX, gateYBottom], [gateX, gateYUpper]))
     if (isIntersect(playerCords, goalCords, [gateX, gateYBottom], [gateX, gateYUpper])):
-        # print(angle)
         return True
+
+    return False
 
 
 fig = plt.figure()
