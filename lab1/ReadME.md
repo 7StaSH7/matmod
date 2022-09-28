@@ -1,2 +1,1 @@
-﻿* `virtualenv -p python3 venv`
-* `venv\Scripts\activate.bat`
+﻿## Просто запустить `init.bat` 
