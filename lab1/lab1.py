@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import math
 import numpy as np
-
+from shapely.geometry import LineString
 
 V0 = (float(input("Введите скорость мяча после удара (км/ч): ")) * 1000) / 3600
 alpha0 = math.radians(
@@ -21,7 +21,7 @@ gateYMiddle, gateYBottom, gateYUpper = fieldWidth / 2, fieldWidth / 2 - \
 
 gateButtomCords = np.array([gateX, gateYBottom])
 gateUpperCords = np.array([gateX, gateYUpper])
-maxLength = math.floor((V0**2*math.sin(2*alpha0)) / g)
+maxLength = math.floor((V0**2 * math.sin(2 * alpha0)) / g)
 maxTime = 2 * V0 * math.sin(alpha0) / g
 
 print("V0: ", V0)
@@ -31,26 +31,26 @@ print("maxTime: ", maxTime)
 
 
 def rotate(origin, point, angle):
-    """
-    Rotate a point counterclockwise by a given angle around a given origin.
 
-    The angle should be given in radians.
-    """
-    ox, oy = origin
-    px, py = point
-
-    qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
-    qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
-    return qx, qy
+    R = np.array([[np.cos(angle), -np.sin(angle)],
+                  [np.sin(angle),  np.cos(angle)]])
+    o = np.atleast_2d(origin)
+    point = np.atleast_2d(point)
+    return np.squeeze((R @ (point.T-o.T) + o.T).T)
 
 
-def calcAngle(vector1, vector2):
-    x1, y1 = vector1
-    x2, y2 = vector2
-    inner_product = x1 * x2 + y1 * y2
-    len1 = math.hypot(x1, y1)
-    len2 = math.hypot(x2, y2)
-    return math.acos(inner_product / (len1 * len2))
+def dotproduct(v1, v2):
+    return sum((a * b) for a, b in zip(v1, v2))
+
+
+def length(v):
+    return math.sqrt(dotproduct(v, v))
+
+
+def angleBetween(v1, v2):
+    if length(v1) * length(v2) == float(0):
+        return 0
+    return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
 
 
 def ccw(A, B, C):
@@ -61,23 +61,31 @@ def isIntersect(A, B, C, D):
     return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
 
 
+def angle_between(v1, v2):
+    if length(v1) * length(v2) == float(0):
+        return 0
+    return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
+
+
 def calcIsScored(playerX, playerY):
     playerCords = np.array([playerX, playerY])
     goalCordsWithoutRotate = np.array([playerX + maxLength, playerY])
 
-    angle = calcAngle(np.array([gateX, gateYMiddle] - playerCords),
-                      np.array([playerX + maxLength, playerY]) - playerCords)
+    angle = angleBetween(np.array([gateX, gateYMiddle] - playerCords),
+                         np.array(goalCordsWithoutRotate - playerCords),)
 
     if playerY > fieldWidth / 2:
         angle = -angle
 
     goalCords = rotate(playerCords, goalCordsWithoutRotate, angle)
-    timeToGateX = (goalCords[0] - playerX) / (V0 * math.cos(alpha0))
+
+    timeToGateX = (gateX - playerX) / (V0 * math.cos(alpha0))
+
     if timeToGateX > maxTime:
         timeToGateX = 0
 
-    isHop = V0 * math.sin(alpha0) * timeToGateX - (g * timeToGateX **
-                                                   2) / 2 > gateHeight if timeToGateX > 0 else False
+    isHop = V0 * math.sin(alpha0) * timeToGateX - \
+        (g * timeToGateX**2) / 2 > gateHeight
 
     if (isIntersect(playerCords, goalCords, [gateX, gateYBottom], [gateX, gateYUpper]) and not isHop):
         return True
@@ -103,8 +111,8 @@ plt.xlim(-2, 122)
 plt.axis('off')
 
 print('Вычисляем...')
-for playerX in range(fieldLength):
-    for playerY in range(fieldWidth):
+for playerX in range(fieldLength + 1):
+    for playerY in range(fieldWidth + 1):
         isScored = calcIsScored(playerX, playerY)
         if isScored:
             ax.add_patch(plt.Circle((playerX, playerY), 0.6, color="black"))
