@@ -1,3 +1,2 @@
 ﻿numpy
 matplotlib
-shapely
