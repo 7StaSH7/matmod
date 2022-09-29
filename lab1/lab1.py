@@ -3,9 +3,8 @@ from matplotlib.patches import *
 import matplotlib.pyplot as plt
 import math
 import numpy as np
-from shapely.geometry import LineString
 
-V0 = (float(input("Введите скорость мяча после удара (км/ч): ")) * 1000) / 3600
+V0 = (float(input("Введите скорость мяча после удара (м/с): ")))
 alpha0 = math.radians(
     float(input("Введите угол, под которым был ударен мяч (градусы): ")))
 
@@ -28,10 +27,10 @@ gateUpperCords = np.array([gateX, gateYUpper])
 maxLength = math.floor((V0**2 * math.sin(2 * alpha0)) / g)
 maxTime = 2 * V0 * math.sin(alpha0) / g
 
-print("V0: ", V0)
-print("maxLength: ", maxLength)
-print("math.sin(alpha0): ", math.sin(alpha0))
-print("maxTime: ", maxTime)
+# print("V0: ", V0)
+# print("maxLength: ", maxLength)
+# print("math.sin(alpha0): ", math.sin(alpha0))
+# print("maxTime: ", maxTime)
 
 
 def rotate(origin, point, angle):
@@ -104,7 +103,7 @@ ax = fig.add_subplot(1, 1, 1)
 Pitch = Rectangle([0, 0], width=fieldLength, height=fieldWidth, fill=False)
 
 Gate = Rectangle(
-    [fieldLength - 0.5, fieldWidth / 2 - gateWidth / 2], width=1, height=gateWidth, fill=True)
+    [fieldLength - 0.5, fieldWidth / 2 - gateWidth / 2], width=1, height=gateWidth, fill=True, color="red")
 
 element = [Pitch, Gate]
 for i in element:
@@ -120,5 +119,5 @@ for playerX in range(fieldLength + 1):
         if isScored(playerX, playerY):
             ax.add_patch(plt.Circle((playerX, playerY), 0.6, color="black"))
 
-print('БУМ!')
+print('Вычислено!')
 plt.show()
