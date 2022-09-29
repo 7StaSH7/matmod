@@ -3,9 +3,8 @@ from matplotlib.patches import *
 import matplotlib.pyplot as plt
 import math
 import numpy as np
-from shapely.geometry import LineString
 
-V0 = (float(input("Введите скорость мяча после удара (км/ч): ")) * 1000) / 3600
+V0 = (float(input("Введите скорость мяча после удара (м/с): ")))
 alpha0 = math.radians(
     float(input("Введите угол, под которым был ударен мяч (градусы): ")))
 
@@ -104,7 +103,7 @@ ax = fig.add_subplot(1, 1, 1)
 Pitch = Rectangle([0, 0], width=fieldLength, height=fieldWidth, fill=False)
 
 Gate = Rectangle(
-    [fieldLength - 0.5, fieldWidth / 2 - gateWidth / 2], width=1, height=gateWidth, fill=True)
+    [fieldLength - 0.5, fieldWidth / 2 - gateWidth / 2], width=1, height=gateWidth, fill=True, color="red")
 
 element = [Pitch, Gate]
 for i in element:
@@ -120,5 +119,5 @@ for playerX in range(fieldLength + 1):
         if isScored(playerX, playerY):
             ax.add_patch(plt.Circle((playerX, playerY), 0.6, color="black"))
 
-print('БУМ!')
+print('Вычислено!')
 plt.show()
