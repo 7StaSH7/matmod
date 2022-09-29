@@ -1,4 +1,5 @@
-﻿from matplotlib.patches import *
+﻿from numpy import *
+from matplotlib.patches import *
 import matplotlib.pyplot as plt
 import math
 import numpy as np
@@ -18,6 +19,9 @@ gateX = fieldLength
 gateYMiddle, gateYBottom, gateYUpper = fieldWidth / 2, fieldWidth / 2 - \
     gateWidth / 2, fieldWidth / 2 + gateWidth / 2
 
+gateUpperCords = np.array([gateX, gateYUpper])
+gateMiddleCords = np.array([gateX, gateYMiddle])
+gateBottomCords = np.array([gateX, gateYBottom])
 
 gateButtomCords = np.array([gateX, gateYBottom])
 gateUpperCords = np.array([gateX, gateYUpper])
@@ -40,7 +44,8 @@ def rotate(origin, point, angle):
 
 
 def dotproduct(v1, v2):
-    return sum((a * b) for a, b in zip(v1, v2))
+    iter = ((a * b) for a, b in zip(v1, v2))
+    return np.sum(np.fromiter(iter, float))
 
 
 def length(v):
@@ -53,25 +58,19 @@ def angleBetween(v1, v2):
     return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
 
 
-def ccw(A, B, C):
+def checkIntersection(A, B, C):
     return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
 
 
 def isIntersect(A, B, C, D):
-    return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
+    return checkIntersection(A, C, D) != checkIntersection(B, C, D) and checkIntersection(A, B, C) != checkIntersection(A, B, D)
 
 
-def angle_between(v1, v2):
-    if length(v1) * length(v2) == float(0):
-        return 0
-    return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
-
-
-def calcIsScored(playerX, playerY):
+def isScored(playerX, playerY):
     playerCords = np.array([playerX, playerY])
     goalCordsWithoutRotate = np.array([playerX + maxLength, playerY])
 
-    angle = angleBetween(np.array([gateX, gateYMiddle] - playerCords),
+    angle = angleBetween(np.array(gateMiddleCords - playerCords),
                          np.array(goalCordsWithoutRotate - playerCords),)
 
     if playerY > fieldWidth / 2:
@@ -79,16 +78,21 @@ def calcIsScored(playerX, playerY):
 
     goalCords = rotate(playerCords, goalCordsWithoutRotate, angle)
 
-    timeToGateX = (gateX - playerX) / (V0 * math.cos(alpha0))
+    if (isIntersect(playerCords, goalCords, gateBottomCords, gateUpperCords)):
 
-    if timeToGateX > maxTime:
-        timeToGateX = 0
+        timeToGate = (fieldLength - playerX) / \
+            (V0 * math.cos(angle) * math.cos(alpha0))
 
-    isHop = V0 * math.sin(alpha0) * timeToGateX - \
-        (g * timeToGateX**2) / 2 > gateHeight
+        if timeToGate > maxTime:
+            timeToGate = 0
 
-    if (isIntersect(playerCords, goalCords, [gateX, gateYBottom], [gateX, gateYUpper]) and not isHop):
-        return True
+        isHop = V0 * math.sin(alpha0) * timeToGate - \
+            (g * timeToGate**2) / 2 > gateHeight
+
+        if not isHop:
+            return True
+
+        return False
 
     return False
 
@@ -113,9 +117,8 @@ plt.axis('off')
 print('Вычисляем...')
 for playerX in range(fieldLength + 1):
     for playerY in range(fieldWidth + 1):
-        isScored = calcIsScored(playerX, playerY)
-        if isScored:
+        if isScored(playerX, playerY):
             ax.add_patch(plt.Circle((playerX, playerY), 0.6, color="black"))
 
-print('Вычислено')
+print('БУМ!')
 plt.show()
