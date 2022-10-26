@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 black = "^22.10.0"
+matplotlib = "^3.6.1"
 
 [tool.poetry.scripts]
 lab = "lab4:main"
