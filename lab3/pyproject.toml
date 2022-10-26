@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "lab3"
+version = "0.1.0"
+description = ""
+authors = ["Aleksandr <sanchasyo@mail.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+black = "^22.10.0"
+
+[tool.poetry.scripts]
+lab = "lab3:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
