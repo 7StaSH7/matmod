@@ -8,7 +8,7 @@ vent_weigth = 1
 vent_radius = 5
 
 
-def calc(koef: int, spring_oscillation_period: float) -> None:
+def calc(koef: float, spring_oscillation_period: float) -> None:
     vent_oscillation_period = koef * spring_oscillation_period
 
     t = np.linspace(0, vent_oscillation_period, 1000)
@@ -29,6 +29,6 @@ def calc(koef: int, spring_oscillation_period: float) -> None:
 def main() -> None:
     spring_oscillation_period = 2 * np.pi * np.sqrt(vent_weigth / spring_stiffness_koef)
 
-    for koef in range(1, 11):
+    for koef in np.arange(1.0, 11.0, 0.5):
         calc(koef, spring_oscillation_period)
     plt.show()
