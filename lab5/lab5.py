@@ -21,12 +21,17 @@ def main() -> None:
     initianal = np.array([N0, M0])
     t = np.linspace(0, 17, 1000)
     # ode - ordinary differential equation или обыкновенное дифференциальное уравнение
-    population, infodict = odeint(calc_populate, initianal, t, full_output=True) 
+    population = odeint(calc_populate, initianal, t) 
     
-    print(infodict['message'])
     
     prays, predators = population.T
-    
+    plt.figure()
+    plt.plot(prays, predators)
+    plt.xlabel('Жертвы')
+    plt.ylabel('Хищники')
+    plt.title('Завимость поуляций друг от друга')
+
+
     plt.figure()
     plt.plot(t, predators, '-r', label='Хищники')
     plt.plot(t, prays, '-b', label='Жертвы')
